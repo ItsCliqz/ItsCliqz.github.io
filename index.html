@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8">
+  <title>Cliqz page</title>
+
+  <link rel="shortcut icon" type="image/x-icon" href="favicon.ico">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+
+  <style>
+    body {
+        background: #222;
+        color: lightgrey;
+        padding: .5em;
+    }
+
+    code {
+      background-color: rgb(93, 93, 93);
+    }
+
+    a.disabled {
+      border: none;
+      background-image: none;
+      opacity: .4;
+      cursor: not-allowed;
+      box-shadow: none;
+      pointer-events: none;
+    }
+
+    .page-selection {
+      margin-bottom: .5em;
+    }
+
+    .page-selection a{
+      margin-right: .5em;
+    }
+
+    .social-links {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: center;
+    }
+
+    .social-link {
+      display: flex;
+      flex-direction: row;
+      cursor: pointer;
+      background-color: lightgrey;
+      border-radius: 5px;
+      padding: 5px;
+      align-items: center;
+      color: black;
+      width: 250px;
+      text-decoration: none;
+      margin:.25em;
+    }
+
+    .social-link .icon {
+      height: 2em;
+      margin-right: .5em;
+    }
+
+    .social-link .info {
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;      
+    }
+
+    .social-link .info .text {
+      font-weight: bold;
+    }
+
+    .social-link .info .url {
+      text-decoration: underline;
+    }
+
+
+    .command_list {
+      display: flex;
+      flex-direction: column;  
+      max-width: 800px;
+      margin: 1em;
+    }
+
+    .command_list .command {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      border-bottom: 1px solid gray;
+      margin: .25em;
+    }
+
+    .command_list .command .chat_command {
+      flex-grow: 1;
+      margin-left: .5em;
+    }
+
+    .casual_googledoc {
+      width: 100%;
+      height: 100vh;
+    }
+
+    .goals_googledoc {
+      width: 100%;
+      height: 100vh;
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>Cliqz website</h1>
+
+  <div id="app" >
+    <div class="pure-form page-selection">
+      <a :class="{disabled : page=='landing'}" class="pure-button" href="#">Home</a>
+      <a :class="{disabled : page=='fragen'}" class="pure-button" href="#fragen">Fragen</a>
+      <a :class="{disabled : page=='commands'}" class="pure-button" href="#commands">Commands</a>
+      <a :class="{disabled : page=='casuals'}" class="pure-button" href="#casuals">Casuals</a>
+      <a :class="{disabled : page=='goals'}" class="pure-button" href="#goals">Goals</a>
+    </div>
+    <div v-if="page=='landing'">
+        Das ist die Website des Streamers genannt Cliqz, nich die des gescheiterten Webbrowsers.
+        <br>
+        Mehr von dem Streamer, nich dem Browser, gibts hier:
+        <br>
+        <div class="social-links">
+          <a :href="'https://' + l.url" class="social-link" v-for="l in social_links">
+            <img :src="l.icon" class="icon" />
+            <div class="info">
+              <div class="text">{{l.text}}</div>
+              <div class="url">{{l.url}}</div>
+            </div>
+          </a>
+        </div>
+        
+    </div>
+    <div v-if="page=='fragen'">
+      Hier könnt ihr Fragen für das Quiz im Chat anlegen und/oder editieren und exportieren.
+      Die exportierte .js-Datei dann Cliqz z.B. per Discord zukommen lassen.
+      <br>
+      <br>
+      Jaja, das kommt noch wenn ich Zeit hab...
+    </div>
+    <div v-if="page=='commands'">
+      <div>
+        Hier sind alle Commands für den Twitch-Chat aufgelistet. Steht hinter einem Command noch ein * wird noch eine Angabe erwartet. Z.B. bei <code>!multispin *</code> muss noch eine Zahl hinter (also z.B. <code>!multispin 5</code>) 
+      </div>
+      <div class="command_list">
+        <div v-for="com in commands" class="command">
+          <button class="pure-button" title="In die Zwischenablage kopieren" @click="copyToClipboard(com.command)">📋</button>
+          <div class="chat_command">
+            {{com.command}}
+          </div>
+          <div class="name">
+            {{com.name}}
+          </div>
+        </div>
+      </div>
+    </div>
+    <div v-if="page=='casuals'">
+      <div>
+        Hier eine übersicht aller durchgespielten Casual Games:        
+      </div>
+      <iframe class="casual_googledoc" src="https://docs.google.com/spreadsheets/d/1dodr7GW-6ONxlrFgWI2jfgZRHAH4EbOf6B0-oqT7yvg/edit?gid=60925048#gid=60925048">
+      </iframe>
+    </div>
+    <div v-if="page=='goals'">
+      <div>
+        Hier eine übersicht der Streaming Goals:
+      </div>
+      <iframe class="goals_googledoc" src="https://docs.google.com/spreadsheets/d/1dodr7GW-6ONxlrFgWI2jfgZRHAH4EbOf6B0-oqT7yvg/edit?gid=0#gid=0">
+      </iframe>
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.prod.js"></script>
+  <script>let chatcommands = [];</script>
+  <script src="commands.js"></script>
+  <script>
+
+    function copyTextToClipboard(text) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                //alert("Text wurde kopiert!");
+            })
+            .catch(err => {
+                alert("Fehler: " + err);
+            });
+    }
+
+
+    const { createApp } = Vue;
+    createApp({
+      data() {
+        return {
+            page: "landing",
+            social_links : [
+              {
+                text : "Twitch",
+                icon : "./imgs/logos/twitch.svg",
+                url : "twitch.tv/itscliqz"
+              },
+              {
+                text : "Youtube",
+                icon : "./imgs/logos/youtube.svg",
+                url : "youtube.com/@itscliqz"
+              },
+              {
+                text : "TikTok",
+                icon : "./imgs/logos/tiktok.svg",
+                url : "tiktok.com/@itscliqz"
+              },
+              {
+                text : "Instagram",
+                icon : "./imgs/logos/instagram.svg",
+                url : "instagram.com/itscliqz"
+              },
+              {
+                text : "Twitter",
+                icon : "./imgs/logos/twitter.svg",
+                url : "twitter.com/ItsCliqz"
+              },
+              {
+                text : "Discord",
+                icon : "./imgs/logos/discord.svg",
+                url : "discord.gg/at4XfddPYB"
+              },
+              {
+                text : "Merch",
+                icon : "./imgs/logos/merch.svg",
+                url : "cliqz.myspreadshop.de/"
+              },
+            ],
+            commands : chatcommands
+        }        
+      },
+      mounted () {
+        let that = this;
+        let handleChange = () => {
+          let page = window.location.hash;
+          if(page)
+            page = window.location.hash.slice(1)
+          that.set_page(page)
+        };
+        window.addEventListener('hashchange', handleChange);
+        handleChange();
+      },
+      methods : {
+        set_page(page){
+
+          if(page == "fragen") {
+            this.page = "fragen";
+            return;  
+          }
+
+          if(page == "commands") {
+            this.page = "commands";
+            return;
+          }
+
+          if(page == "casuals") {
+            this.page = "casuals";
+            return;
+          }
+
+          if(page == "goals") {
+            this.page = "goals";
+            return;
+          }
+          
+          this.page = "landing";
+        },
+        copyToClipboard(text) {
+          copyTextToClipboard(text);
+        }
+      }
+    }).mount('#app');
+  </script>
+</body>
+</html>
