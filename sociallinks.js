@@ -1,1 +1,42 @@
-bGlua3MgPSBbCiAgICB7CiAgICAgICAgdGV4dCA6ICJUd2l0Y2giLAogICAgICAgIGljb24gOiAiLi9pbWdzL2xvZ29zL3R3aXRjaC5zdmciLAogICAgICAgIHVybCA6ICJ0d2l0Y2gudHYvaXRzY2xpcXoiCiAgICB9LAogICAgewogICAgICAgIHRleHQgOiAiWW91dHViZSIsCiAgICAgICAgaWNvbiA6ICIuL2ltZ3MvbG9nb3MveW91dHViZS5zdmciLAogICAgICAgIHVybCA6ICJ5b3V0dWJlLmNvbS9AaXRzY2xpcXoiCiAgICB9LAogICAgewogICAgICAgIHRleHQgOiAiVGlrVG9rIiwKICAgICAgICBpY29uIDogIi4vaW1ncy9sb2dvcy90aWt0b2suc3ZnIiwKICAgICAgICB1cmwgOiAidGlrdG9rLmNvbS9AaXRzY2xpcXoiCiAgICB9LAogICAgewogICAgICAgIHRleHQgOiAiSW5zdGFncmFtIiwKICAgICAgICBpY29uIDogIi4vaW1ncy9sb2dvcy9pbnN0YWdyYW0uc3ZnIiwKICAgICAgICB1cmwgOiAiaW5zdGFncmFtLmNvbS9pdHNjbGlxeiIKICAgIH0sCiAgICB7CiAgICAgICAgdGV4dCA6ICJUd2l0dGVyIiwKICAgICAgICBpY29uIDogIi4vaW1ncy9sb2dvcy90d2l0dGVyLnN2ZyIsCiAgICAgICAgdXJsIDogInR3aXR0ZXIuY29tL0l0c0NsaXF6IgogICAgfSwKICAgIHsKICAgICAgICB0ZXh0IDogIkRpc2NvcmQiLAogICAgICAgIGljb24gOiAiLi9pbWdzL2xvZ29zL2Rpc2NvcmQuc3ZnIiwKICAgICAgICB1cmwgOiAiZGlzY29yZC5nZy9hdDRYZmRkUFlCIgogICAgfSwKICAgIHsKICAgICAgICB0ZXh0IDogIlNwZWVkcnVuLmNvbSIsCiAgICAgICAgaWNvbiA6ICIuL2ltZ3MvbG9nb3Mvc3BlZWRydW4uc3ZnIiwKICAgICAgICB1cmwgOiAic3BlZWRydW4uY29tL3VzZXJzL0NsaXF6IgogICAgfSwKICAgIHsKICAgICAgICB0ZXh0IDogIk1lcmNoIiwKICAgICAgICBpY29uIDogIi4vaW1ncy9sb2dvcy9tZXJjaC5zdmciLAogICAgICAgIHVybCA6ICJjbGlxei5teXNwcmVhZHNob3AuZGUvIgogICAgfSwKXTs=
+links = [
+    {
+        text : "Twitch",
+        icon : "./imgs/logos/twitch.svg",
+        url : "twitch.tv/itscliqz"
+    },
+    {
+        text : "Youtube",
+        icon : "./imgs/logos/youtube.svg",
+        url : "youtube.com/@itscliqz"
+    },
+    {
+        text : "TikTok",
+        icon : "./imgs/logos/tiktok.svg",
+        url : "tiktok.com/@itscliqz"
+    },
+    {
+        text : "Instagram",
+        icon : "./imgs/logos/instagram.svg",
+        url : "instagram.com/itscliqz"
+    },
+    {
+        text : "Twitter",
+        icon : "./imgs/logos/twitter.svg",
+        url : "twitter.com/ItsCliqz"
+    },
+    {
+        text : "Discord",
+        icon : "./imgs/logos/discord.svg",
+        url : "discord.gg/at4XfddPYB"
+    },
+    {
+        text : "Speedrun.com",
+        icon : "./imgs/logos/speedrun.svg",
+        url : "speedrun.com/users/Cliqz"
+    },
+    {
+        text : "Merch",
+        icon : "./imgs/logos/merch.svg",
+        url : "cliqz.myspreadshop.de/"
+    },
+];

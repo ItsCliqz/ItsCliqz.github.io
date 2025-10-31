@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+
+    <meta charset="UTF-8">
+    <title>Quiz</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/purecss@3.0.0/build/pure-min.css" integrity="sha384-X38yfunGUhNzHpBaEBsWLO+A0HDYOQi8ufWDkZ0k9e0eXz/tH3II7uKZ9msv++Ls" crossorigin="anonymous">
+
+    <style type="text/css">
+
+        .bold {
+            font-weight:bold;
+        }
+
+        body {
+            padding-left: 1em;
+            padding-right: 1em;
+            background  : rgb(25,25,25);
+            color:rgb(220, 220, 220);
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .button-success {
+            background: rgb(28, 184, 65);
+        }
+
+        .button-error {
+            background: rgb(202, 60, 60);
+        }
+
+        #header {
+            font-size: 3em;
+            font-weight: bold;
+        }
+
+        .subheader {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+
+        #add_question {
+            border: 1px solid gray;
+            padding: 15px;
+        }
+
+        #add_question .add_button_container {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+        }
+
+        .heading {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .question_line {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            border-bottom: 1px solid gray;
+            padding: 5px;
+        }
+
+        .question_line .infos {
+            margin-left: 10px;
+            flex-grow: 1;
+        }
+
+        .question_line .infos .answers {
+            display: flex;
+            flex-direction: row;
+            flex-wrap: wrap;
+        }
+
+        .question_line .infos .answers .answer {
+            margin-left: 10px;
+        }
+
+        .question_line .infos .answers .correct {
+            font-weight: bold;
+        }
+
+        .question_line .infos .tags {
+            display: flex;
+            flex-direction: row;
+        }
+
+        .question_line .infos .tags .tag {
+            margin-left: 10px;
+        }
+        
+        .question_line .buttons {
+            display: flex;
+            flex-direction: column;
+            margin-left: 10px;
+        }
+
+        .question_line .buttons button{
+            margin-top:5px;
+        }
+                               
+    </style>       
+
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+<body>
+    
+    <div id="content">
+
+        <div id="add_question">
+            <div style="display: flex; flex-direction: row;justify-content: space-between;align-items: center;">
+                <div>Add question:</div>
+                <button class="pure-button" @click="import_from_file()">Import from file</button>
+            </div>
+            
+            <div>
+                <div>
+                    Text: <textarea v-model="nq_text" style="width:100%;"></textarea>
+                </div>
+                <div v-if="!nq_is_js">
+                    Answers (write only first as number for estimation question):
+                    <div>
+                        <input type="radio" name="nq_correct" :value="0" v-model="nq_correct" />
+                        <input type="text" v-model="qn_answer_0" />
+                    </div>
+                    <div>
+                        <input type="radio" name="nq_correct" :value="1" v-model="nq_correct" />
+                        <input type="text" v-model="qn_answer_1" />
+                    </div>
+                    <div>
+                        <input type="radio" name="nq_correct" :value="2" v-model="nq_correct" />
+                        <input type="text" v-model="qn_answer_2" />
+                    </div>
+                    <div>
+                        <input type="radio" name="nq_correct" :value="3" v-model="nq_correct" />
+                        <input type="text" v-model="qn_answer_3" />
+                    </div>
+                    <div>
+                        <input type="radio" name="nq_correct" :value="4" v-model="nq_correct" />
+                        <input type="text" v-model="qn_answer_4" />
+                    </div>
+                    <div>
+                        <input type="radio" name="nq_correct" :value="5" v-model="nq_correct" />
+                        <input type="text" v-model="qn_answer_5" />
+                    </div>
+                </div>
+                <div v-if="!nq_is_js">
+                    Tags (, separated):
+                    <input type="text" v-model="qn_tags" />
+                </div>
+                <div class="add_button_container" v-if="!nq_is_js">                    
+                    <button class="pure-button button-error" @click="clear_question()">Clear question fields</button>
+                    <div>
+                        <button v-if="qn_index >= 0" style="margin-right: 10px;" class="pure-button button-success" @click="replace_question()">Apply change</button>
+                        <button class="pure-button button-success" @click="add_question()">Add question</button>
+                    </div>
+                </div>
+                <div class="add_button_container" v-if="nq_is_js">                    
+                    <div></div>
+                    <button class="pure-button button-success" @click="add_question_js()">Import question</button>
+                </div>
+            </div>
+        </div>
+
+        <br>
+    
+        <div id="unused_questions" v-if="unused_qs.length > 0">
+            <div class="heading">
+                <div class="subheader">
+                    Questions ({{unused_qs.length}}):
+                </div>                
+                <div>
+                    <button
+                        class="pure-button button-success"
+                        style="margin-right: 10px;"
+                        @click="export_to_file()"
+                        v-if="unused_qs.length > 0"
+                    >
+                        Export all
+                    </button>
+                    <button
+                        class="pure-button button-error"
+                        @click="clear_questions()"
+                    >
+                        clear
+                    </button>
+                </div>
+            </div>
+            <div v-for="(q, index) in unused_qs" class="question_line">
+                <div>
+                    {{index}}
+                </div>
+                <div class="infos">
+                    <div>
+                        {{q.t}}
+                    </div>
+                    <div v-if="q.a" class="answers">
+                        <b>Answers</b>: 
+                        <div v-for="(a, i) in q.a" class="answer" :class="{correct : i == q.c}">
+                            {{String.fromCharCode(97 + i)}}) {{a}}
+                        </div>
+                    </div>
+                    <div v-if="!q.a">
+                        <b>Exact answer</b>: <b>{{q.c}}</b>
+                    </div>
+
+                    <div v-if="q.g" class="tags">
+                        <b>Tags</b>:
+                        <div v-for="g in q.g" class="tag">
+                        {{g}}
+                        </div>
+                    </div>
+                    
+                </div>
+
+                <div class="buttons">
+                    <button class="pure-button" @click="copy_question_to_clipboard(index)">to clipboard</button>
+                    <button class="pure-button" @click="edit_question(index)">edit</button>
+                    <button class="pure-button button-error" @click="remove_question(index)">remove</button>                    
+                </div>
+                
+            </div>
+            
+        </div>
+
+
+    </div>
+
+</body>
+</html>
+
+<script>
+
+
+    function copyTextToClipboard(text) {
+        navigator.clipboard.writeText(text)
+            .then(() => {
+                //alert("Text wurde kopiert!");
+            })
+            .catch(err => {
+                alert("Fehler: " + err);
+            });
+    }
+
+    let getRandomString = (length) => {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        let counter = 0;
+        while (counter < length) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+            counter += 1;
+        }
+        return result;
+    };
+
+    function download(data, filename, type) {
+        var file = new Blob([data], {type: type});
+        if (window.navigator.msSaveOrOpenBlob) // IE10+
+            window.navigator.msSaveOrOpenBlob(file, filename);
+        else { // Others
+            var a = document.createElement("a"),
+                    url = URL.createObjectURL(file);
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(function() {
+                document.body.removeChild(a);
+                window.URL.revokeObjectURL(url);
+            }, 0);
+        }
+    }
+
+    let upload_file = (callback) => {
+        var input = document.createElement('input');
+        input.type = 'file';
+
+        input.onchange = e => {
+
+            // getting a hold of the file reference
+            var file = e.target.files[0]; 
+
+            // setting up the reader
+            var reader = new FileReader();
+            reader.readAsText(file,'UTF-8');
+
+            // here we tell the reader what to do when it's done reading...
+            reader.onload = readerEvent => {
+                var content = readerEvent.target.result; // this is the content!
+                callback(content);
+            }
+
+        }
+
+        input.click();
+    }
+
+    let toDateString = (date) => {
+        let dt = new Date(date);
+        let day = dt.getDate() + "";
+        if(day.length <= 1)
+            day = "0" + day;
+        let month = (dt.getMonth() + 1) + "";
+        if(month.length <= 1)
+            month = "0" + month;
+
+        return day + "." + month + "." + dt.getFullYear();
+    }
+
+    function debounce(func, timeout = 300){
+        let timer;
+        return (...args) => {
+            clearTimeout(timer);
+            timer = setTimeout(() => { func.apply(this, args); }, timeout);
+        };
+    }    
+   
+    const { createApp, ref } = Vue
+
+    let app = createApp({        
+        data() {
+            return {
+
+                nq_correct : 0,
+                nq_text : "",
+                qn_answer_0 : "",
+                qn_answer_1 : "",
+                qn_answer_2 : "",
+                qn_answer_3 : "",
+                qn_answer_4 : "",
+                qn_answer_5 : "",
+                qn_tags : "",
+                qn_l : -1,
+                qn_index : -1,
+                
+                unused_qs : [],
+                
+            }
+        },
+        computed: {
+            sortedPoints() {
+                
+                let ret = [];
+                for(let key in this.points)
+                ret.push(
+                    {
+                        user: key,
+                        points: this.points[key]
+                    }
+                );
+                ret.sort((a, b) => b.points - a.points);
+
+                return ret;
+                
+            },
+            nq_is_js() {
+                return this.nq_text.startsWith("{") || this.nq_text.startsWith("[");
+            }
+        },
+        methods: {                 
+            remove_question : function(index) {                
+                this.unused_qs.splice(index, 1);
+            },
+            copy_question_to_clipboard : function(index){
+                let q = this.unused_qs[index];
+                let text = JSON.stringify(q);
+                copyTextToClipboard(text);
+            },
+            export_to_file : function() {               
+                let text = JSON.stringify(this.unused_qs);
+                download(text, "questions.js", 'text/plain');
+            },
+            is_question_valid: function(q) {
+                if(!q.t)
+                    return false;
+                if(isNaN(q.c))
+                    return false;
+                let c = parseInt(q.c);
+                if(q.a) {
+                    if(Array.isArray(q.a)) {
+                        if(q.a.length - 1 < c)
+                            return false;
+                    } else
+                        return false;
+                }
+                if(q.g) {
+                    if(!Array.isArray(q.g))
+                        return false;
+                }
+                return true;
+            },
+            add_question : function() {
+
+                let question = false;
+                try {
+                    question = this.get_question_from_inputs();
+                } catch (error) {
+                    alert(error);
+                    return;
+                }
+
+                this.unused_qs.push(question);
+                
+            },
+            replace_question : function() {
+
+                if(this.qn_index < 0) {
+                    alert("Missing index");
+                    return;
+                }
+
+                let question = false;
+                try {
+                    question = this.get_question_from_inputs();
+                } catch (error) {
+                    alert(error);
+                    return;
+                }
+                
+                this.unused_qs[this.qn_index] = question;               
+
+                this.qn_index = -1;
+            },
+            edit_question : function(index) {
+                                
+                this.qn_index = index;
+
+                this.fill_in_question_fields(
+                    this.unused_qs[index]
+                );
+
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            },
+            fill_in_question_fields : function(q){
+                this.nq_text = q.t;
+
+                this.qn_answer_0 = "";
+                this.qn_answer_1 = "";
+                this.qn_answer_2 = "";
+                this.qn_answer_3 = "";
+                this.qn_answer_4 = "";
+                this.qn_answer_5 = "";
+                
+                if(!q.a || q.a.length <= 0){
+                    this.nq_correct = 0;
+                    this.qn_answer_0 = q.c;
+                } else {
+                    this.nq_correct = q.c;
+
+                    if(q.a.length > 0) this.qn_answer_0 = q.a[0];
+                    if(q.a.length > 1) this.qn_answer_1 = q.a[1];
+                    if(q.a.length > 2) this.qn_answer_2 = q.a[2];
+                    if(q.a.length > 3) this.qn_answer_3 = q.a[3];
+                    if(q.a.length > 4) this.qn_answer_4 = q.a[4];
+                    if(q.a.length > 5) this.qn_answer_5 = q.a[5];
+                }
+
+                let tags = "";
+                if(q.g && q.g.length > 0) {
+                    for(let t of q.g)
+                        tags += t + ",";
+                    tags = tags.slice(0, -1);
+                }
+                this.qn_tags = tags;
+
+                this.qn_l = q.l ? q.l : -1;
+            },
+            get_question_from_inputs(){
+                if(!this.nq_text)
+                    throw "Enter text for question";
+            
+                let question = {
+                    t: this.nq_text,
+                };
+
+                let answers = [];
+                if(this.qn_answer_0)
+                    answers.push(this.qn_answer_0);
+                if(this.qn_answer_1)
+                    answers.push(this.qn_answer_1);
+                if(this.qn_answer_2)
+                    answers.push(this.qn_answer_2);
+                if(this.qn_answer_3)
+                    answers.push(this.qn_answer_3);
+                if(this.qn_answer_4)
+                    answers.push(this.qn_answer_4);
+                if(this.qn_answer_5)
+                    answers.push(this.qn_answer_5);
+
+                if(answers.length <= 0) 
+                    throw "At least one answer must be given";
+
+                if(answers.length == 1) {
+                    try {
+                        let val = parseInt(answers[0]);
+                        if(val !== 0 && !val)
+                            throw "Only correct value must be a number for estimation question";                        
+                        question["c"] = val;
+                    } catch (error) {
+                        throw "Only correct value must be a number for estimation question";                        
+                    }
+                } else {
+                    question["c"] = this.nq_correct;
+                    question["a"] = answers;
+                }
+                
+                let tags = false;
+                if(this.qn_tags)
+                    tags = this.qn_tags.split(",");
+
+                if(tags) 
+                    question["g"] = tags;
+
+                if(!this.is_question_valid(question))
+                    throw "Invalid question format";
+
+                return question;
+                
+            },
+            add_question_js: function(){
+                if(!this.nq_text) {
+                    alert("Enter json for question");
+                    return;
+                }
+
+                let jobj = false;
+                let jarr = false;
+                try {
+                    if(this.nq_text.startsWith("{"))
+                        jobj = JSON.parse(this.nq_text);
+                    if(this.nq_text.startsWith("["))
+                        jarr = JSON.parse(this.nq_text);                    
+                } catch (error) {
+                    alert("Invalid json");
+                    return;
+                }
+
+                if(!jobj && !jarr) {
+                    alert("No json given as text");
+                    return;
+                }
+
+                if(jobj) {
+                    if(!this.is_question_valid(jobj)){
+                        alert("Invalid question format");
+                        return;
+                    }
+                    this.unused_qs.push(jobj);
+                }
+                if(jarr) {
+                    for(let q of jarr) {
+                        if(!this.is_question_valid(q)){
+                            alert("Invalid question format");
+                            return;
+                        }
+                        this.unused_qs.push(q);
+                    }
+                }
+
+            },
+            import_from_file: function() {
+                let that = this;
+
+                let oldText = that.nq_text;
+
+                upload_file(
+                    (content) => {
+                        that.nq_text = content;
+                        that.add_question_js();
+                        that.nq_text = oldText;
+                    }
+                )
+            },
+            clear_question: function() {
+
+                this.nq_text = "";
+                this.nq_correct = 0;
+                
+                this.qn_answer_0 = "";
+                this.qn_answer_1 = "";
+                this.qn_answer_2 = "";
+                this.qn_answer_3 = "";
+                this.qn_answer_4 = "";
+                this.qn_answer_5 = "";
+
+                this.qn_tags = "";
+            },
+            clear_questions: function() {
+                if(!confirm("Are you sure you want to delete all current questions?"))
+                    return;
+                this.unused_qs = []
+            },
+        }
+    }).mount('#content');
+
+
+    //app.component('WheelEntryComponent', wheelEntryComponent);
+
+
+</script>
+
