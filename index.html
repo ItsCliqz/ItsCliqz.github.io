@@ -74,11 +74,9 @@
 
     .social-links {
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       flex-wrap: wrap;
       justify-content: center;
-      align-items: center;
-      max-width: 1000px;
     }
 
     .social-link {
@@ -125,6 +123,7 @@
     .command_list .command {
       display: flex;
       flex-direction: row;
+      flex-wrap: wrap;
       align-items: center;
       border-bottom: 1px solid gray;
       margin: .25em;
@@ -199,8 +198,42 @@
       <div>
         Hier sind alle Commands für den Twitch-Chat aufgelistet. Steht hinter einem Command noch ein * wird noch eine Angabe erwartet. Z.B. bei <code>!multispin *</code> muss noch eine Zahl hinter (also z.B. <code>!multispin 5</code>) 
       </div>
+      <br>
+      <div>
+        Commands die jeder nutzen kann:
+      </div>
       <div class="command_list">
-        <div v-for="com in commands" class="command">
+        <div v-for="com in public_commands" class="command">
+          <button class="pure-button" title="In die Zwischenablage kopieren" @click="copyToClipboard(com.command)">📋</button>
+          <div class="chat_command">
+            {{com.command}}
+          </div>
+          <div class="name">
+            {{com.name}}
+          </div>
+        </div>
+      </div>
+      <br>
+      <div v-if="mod_commands.length > 0">
+        Commands für Moderatoren:
+      </div>
+      <div class="command_list" v-if="mod_commands.length > 0">
+        <div v-for="com in mod_commands" class="command">
+          <button class="pure-button" title="In die Zwischenablage kopieren" @click="copyToClipboard(com.command)">📋</button>
+          <div class="chat_command">
+            {{com.command}}
+          </div>
+          <div class="name">
+            {{com.name}}
+          </div>
+        </div>
+      </div>
+      <br>
+      <div v-if="streamer_commands.length > 0">
+        Commands für den Streamer:
+      </div>
+      <div class="command_list" v-if="streamer_commands.length > 0">
+        <div v-for="com in streamer_commands" class="command">
           <button class="pure-button" title="In die Zwischenablage kopieren" @click="copyToClipboard(com.command)">📋</button>
           <div class="chat_command">
             {{com.command}}
@@ -248,13 +281,51 @@
 
 
     const { createApp } = Vue;
-    createApp({
+    let app = createApp({
       data() {
         return {
             page: "landing",
             social_links : links,
             commands : chatcommands
         }        
+      },
+      computed : {
+        public_commands : () => {
+          let ret = [];
+
+          for(let com of chatcommands) {
+            if(com.streamer_only || com.mod_only)
+              continue;
+            ret.push(com);
+          }
+          ret.sort((a, b) => a.command.localeCompare(b.command))
+
+          return ret;
+        },
+        mod_commands : () => {
+          let ret = [];
+
+          for(let com of chatcommands) {
+            if(!com.mod_only)
+              continue;
+            ret.push(com);
+          }
+          ret.sort((a, b) => a.command.localeCompare(b.command))
+
+          return ret;
+        },
+        streamer_commands : () => {
+          let ret = [];
+
+          for(let com of chatcommands) {
+            if(!com.streamer_only || com.mod_only)
+              continue;
+            ret.push(com);
+          }
+          ret.sort((a, b) => a.command.localeCompare(b.command))
+
+          return ret;
+        },
       },
       mounted () {
         let that = this;
